@@ -1,0 +1,10 @@
+
+/* CSS - ReservationList.css */
+
+.reserved-tile {
+    background: #ffccbc !important;
+    border-radius: 50%;
+    color: #d32f2f;
+    font-weight: bold;
+  }
+  
