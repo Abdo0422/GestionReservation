@@ -1,0 +1,30 @@
+[
+    {
+      "id": 1,
+      "nomdepart": "Département des affaires générales"
+    },
+    {
+      "id": 2,
+      "nomdepart": "Département du contentieux"
+    },
+    {
+      "id": 3,
+      "nomdepart": "Département de l'exécution"
+    },
+    {
+      "id": 4,
+      "nomdepart": "Département de la comptabilité"
+    },
+    {
+      "id": 5,
+      "nomdepart": "Département des ressources humaines"
+    },
+    {
+      "id": 6,
+      "nomdepart": "Département de l'informatique"
+    },
+    {
+      "id": 7,
+      "nomdepart": "Département de la communication"
+    }
+  ]

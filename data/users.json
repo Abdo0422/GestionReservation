@@ -1,0 +1,9 @@
+[
+  {
+    "id": 1,
+    "name": "Fahd",
+    "password": "$2b$12$5ePY45US4bFUG5vn4An2b.vKyHZBWNrFLd6f0Ho6NdKM3ra4LkDHO",
+    "role": "admin",
+    "numdep": 0
+  }
+]
