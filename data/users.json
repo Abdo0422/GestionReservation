@@ -2,8 +2,45 @@
   {
     "id": 1,
     "name": "Fahd",
+    "email": "fahd@mail.com",
     "password": "$2b$12$5ePY45US4bFUG5vn4An2b.vKyHZBWNrFLd6f0Ho6NdKM3ra4LkDHO",
     "role": "admin",
-    "numdep": 0
+    "numdep": 99
+  },
+  {
+    "id": 2,
+    "name": "employee",
+    "email": "employee@email.com",
+    "password": "$2b$12$cKyoBpjYwAXrybrqaHCyheHdbGyoV7QDabrfLhEtDqqYVu.JWkYKe",
+    "role": "citoyen",
+    "numdep": 99
+  },
+  {
+    "id": 3,
+    "name": "Hamza",
+    "email": "Hamza@mail.com",
+    "password": "$2b$12$tjZLEbYSGXomnDgRuRg1t.YkTvrRVa.IZiPoP1h2YEk/dpRm4oOTW",
+    "role": "chef",
+    "numdep": 2
+  },
+  {
+    "id": 4,
+    "name": "Hassan Fahmi",
+    "email": "shortscrazy636@gmail.com",
+    "password": "$2b$12$ZK1cnwEC5GlpjzbxeM3oFOuze/V6VfLerXPrQiL/IfJTNYaUWdlrK",
+    "role": "citoyen",
+    "numdep": 99,
+    "verified": true,
+    "verification_code": null
+  },
+  {
+    "id": 5,
+    "name": "Bilal",
+    "email": "aistories247@gmail.com",
+    "password": "$2b$12$pHoZGjr4UU/z/hEfidZOwewnqtVSbPBCB9a2sQzE.OIz4E2LzneT6",
+    "role": "chef",
+    "numdep": 4,
+    "verified": false,
+    "verification_code": "ZRUJAT"
   }
 ]
