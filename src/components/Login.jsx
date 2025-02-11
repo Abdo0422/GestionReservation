@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, Grid, Container, Paper, CircularProgress, styled  } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { login } from '../features/actions';
-import axios from '../features/axios';
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Grid,
+  Container,
+  Paper,
+  CircularProgress,
+  styled,
+} from "@mui/material";
+import { useDispatch } from "react-redux";
+import { login } from "../features/actions";
+import axios from "axios";
 
 // Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: '20px 30px',
-  borderRadius: '10px',
-  boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-  backgroundColor: '#fff',
+  padding: "20px 30px",
+  borderRadius: "10px",
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+  backgroundColor: "#fff",
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  padding: '10px 20px',
-  borderRadius: '8px',
-  fontSize: '1rem',
-  color: '#fff',
-  background: 'linear-gradient(45deg, #059669, #10B981)',
-  '&:hover': {
-    background: 'linear-gradient(45deg, #10B981, #059669)',
+  padding: "10px 20px",
+  borderRadius: "8px",
+  fontSize: "1rem",
+  color: "#fff",
+  background: "linear-gradient(45deg, #059669, #10B981)",
+  "&:hover": {
+    background: "linear-gradient(45deg, #10B981, #059669)",
   },
 }));
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -33,23 +43,31 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setError(null); 
+    setError(null);
 
     try {
-      const response = await axios.post('/login', { email, password }); 
+      const response = await axios.post(
+        "https://3z82zf-5000.csb.app/api/login",
+        { email, password }
+      );
 
-      dispatch(login({
-        user: response.data, 
-        role: response.data.role,
-        name: response.data.name,  
-        email: response.data.email,  
-        numdep: response.data.numdep, 
-      }));
+      dispatch(
+        login({
+          user: response.data,
+          role: response.data.role,
+          name: response.data.name,
+          email: response.data.email,
+          numdep: response.data.numdep,
+        })
+      );
 
-      window.location.href = '/'; 
+      window.location.href = "/";
     } catch (error) {
-      console.error("Erreur de connexion:", error); 
-      setError(error.response?.data?.error || 'Une erreur s\'est produite lors de la connexion.');
+      console.error("Erreur de connexion:", error);
+      setError(
+        error.response?.data?.error ||
+          "Une erreur s'est produite lors de la connexion."
+      );
     } finally {
       setLoading(false);
     }
@@ -86,12 +104,12 @@ const Login = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <StyledButton
-                fullWidth
-                type="submit"
-                disabled={loading}
-              >
-                {loading ? <CircularProgress size={24} color="inherit" /> : 'Se connecter'}
+              <StyledButton fullWidth type="submit" disabled={loading}>
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Se connecter"
+                )}
               </StyledButton>
             </Grid>
             {error && (
