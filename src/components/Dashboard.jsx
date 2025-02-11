@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -20,42 +20,42 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
-  styled
-} from '@mui/material';
+  styled,
+  Autocomplete,
+} from "@mui/material";
 import {
   CalendarMonth,
   AccessTime,
   Phone,
   Business,
   Person,
-  Description
-} from '@mui/icons-material';
-import axios from '../features/axios';
-import { useSelector } from 'react-redux';
-import dayjs from 'dayjs';
-import 'dayjs/locale/fr';
+  Description,
+} from "@mui/icons-material";
+import axios from "../features/axios";
+import { useSelector } from "react-redux";
+import dayjs from "dayjs";
+import "dayjs/locale/fr";
 
-dayjs.locale('fr');
+dayjs.locale("fr");
 
-// Styled Components
 const StyledCard = styled(Card)(({ theme }) => ({
-  position: 'relative',
+  position: "relative",
   borderRadius: theme.spacing(2),
-  transition: 'transform 0.3s ease-in-out',
-  overflow: 'hidden',
-  height: '100%',
-  '&:hover': {
-    transform: 'translateY(-4px)',
+  transition: "transform 0.3s ease-in-out",
+  overflow: "hidden",
+  height: "100%",
+  "&:hover": {
+    transform: "translateY(-4px)",
   },
-  '&::before': {
+  "&::before": {
     content: '""',
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
-    background: 'linear-gradient(90deg, #059669 0%, #10B981 100%)',
-  }
+    height: "4px",
+    background: "linear-gradient(90deg, #059669 0%, #10B981 100%)",
+  },
 }));
 
 const StyledCardContent = styled(CardContent)(({ theme }) => ({
@@ -64,34 +64,34 @@ const StyledCardContent = styled(CardContent)(({ theme }) => ({
 }));
 
 const IconWrapper = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing(1.5),
   marginBottom: theme.spacing(2),
 }));
 
 const HeaderBox = styled(Box)(({ theme }) => ({
-  position: 'relative',
+  position: "relative",
   padding: theme.spacing(4, 0),
   marginBottom: theme.spacing(4),
-  textAlign: 'center',
-  '&::before': {
+  textAlign: "center",
+  "&::before": {
     content: '""',
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
-    background: 'linear-gradient(90deg, #059669 0%, #10B981 100%)',
+    height: "4px",
+    background: "linear-gradient(90deg, #059669 0%, #10B981 100%)",
   },
-  '&::after': {
+  "&::after": {
     content: '""',
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    height: '4px',
-    background: 'linear-gradient(90deg, #059669 0%, #10B981 100%)',
+    height: "4px",
+    background: "linear-gradient(90deg, #059669 0%, #10B981 100%)",
   },
 }));
 
@@ -103,30 +103,40 @@ const Dashboard = () => {
   const [openModal, setOpenModal] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
   const [newReservation, setNewReservation] = useState({
-    description: '',
-    date: dayjs().format('YYYY-MM-DD'),
-    time: '09:00',
-    department: '',
-    phone: '',
+    description: "",
+    date: dayjs().format("YYYY-MM-DD"),
+    time: "09:00",
+    department: "",
+    phone: "",
   });
+  const [reservationReasons, setReservationReasons] = useState([
+    "Consultation du registre de commerce",
+    "Dépôt des états financiers",
+    "Immatriculation d'entreprise",
+    "Modification des informations d'entreprise",
+    "Radiation d'entreprise",
+    "Obtention de documents certifiés",
+    "Réunion avec un responsable",
+    "Autre",
+  ]);
 
   useEffect(() => {
     const fetchReservations = async () => {
       setLoading(true);
       try {
         if (user && user.name) {
-          const response = await axios.get('/reservations/user', {
+          const response = await axios.get("/reservations/user", {
             params: { name: user.name },
           });
           setReservations(response.data);
         } else {
-          setError('Utilisateur non connecté ou nom indisponible.');
+          setError("Utilisateur non connecté ou nom indisponible.");
         }
       } catch (err) {
-        setError('Erreur lors de la récupération des réservations.');
+        setError("Erreur lors de la récupération des réservations.");
       } finally {
         setLoading(false);
       }
@@ -138,14 +148,26 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get('/departments');
-        const decodedDepartments = response.data.map((dept) => ({
-          ...dept,
-          nomdepart: decodeURIComponent(escape(dept.nomdepart)),
-        }));
-        setDepartments(decodedDepartments);
+        const response = await axios.get("/departments");
+        const decodedDepartments = response.data.map((dept) => {
+          try {
+            const decodedNomDepart = decodeURIComponent(dept.nomdepart);
+            return { ...dept, nomdepart: decodedNomDepart };
+          } catch (error) {
+            console.warn(`Error decoding nomdepart: ${dept.nomdepart}`, error);
+            return { ...dept, nomdepart: dept.nomdepart || "Nom inconnu" };
+          }
+        });
+        const filteredDepartments = decodedDepartments.filter(
+          (dept) => dept.nomdepart.toLowerCase() !== "aucun"
+        );
+
+        setDepartments(filteredDepartments);
       } catch (error) {
-        console.error('Erreur lors de la récupération des départements:', error);
+        console.error(
+          "Erreur lors de la récupération des départements:",
+          error
+        );
       }
     };
 
@@ -157,35 +179,48 @@ const Dashboard = () => {
       const reservationData = {
         ...newReservation,
         citizen: user.name,
-        status: 'En attente',
+        status: "En attente",
       };
 
-      const response = await axios.post('/reservations', reservationData);
+      const response = await axios.post("/reservations", reservationData);
       setReservations([...reservations, response.data]);
       setOpenModal(false);
-      setSnackbarMessage('Réservation créée avec succès!');
-      setSnackbarSeverity('success');
+      setSnackbarMessage("Réservation créée avec succès!");
+      setSnackbarSeverity("success");
       setSnackbarOpen(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
     } catch (error) {
-      setSnackbarMessage('Erreur lors de la création de la réservation.');
-      setSnackbarSeverity('error');
+      setSnackbarMessage("Erreur lors de la création de la réservation.");
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
   };
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress sx={{ color: '#059669' }} />
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="60vh"
+      >
+        <CircularProgress sx={{ color: "#059669" }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ bgcolor: '#FFFBF5', minHeight: '100vh', pb: 8 }}>
+    <Box sx={{ bgcolor: "#FFFBF5", minHeight: "100vh", pb: 8 }}>
       <Container maxWidth="lg">
         <HeaderBox>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+          <Typography
+            variant="h4"
+            component="h1"
+            gutterBottom
+            fontWeight="bold"
+          >
             Tableau de Bord des Réservations
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
@@ -195,8 +230,8 @@ const Dashboard = () => {
             variant="contained"
             onClick={() => setOpenModal(true)}
             sx={{
-              bgcolor: '#059669',
-              '&:hover': { bgcolor: '#047857' },
+              bgcolor: "#059669",
+              "&:hover": { bgcolor: "#047857" },
               borderRadius: 2,
               px: 4,
               py: 1.5,
@@ -211,7 +246,7 @@ const Dashboard = () => {
             {error}
           </Alert>
         ) : reservations.length === 0 ? (
-          <Card sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
+          <Card sx={{ p: 4, textAlign: "center", borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>
               Aucune réservation trouvée
             </Typography>
@@ -219,8 +254,8 @@ const Dashboard = () => {
               variant="contained"
               onClick={() => setOpenModal(true)}
               sx={{
-                bgcolor: '#059669',
-                '&:hover': { bgcolor: '#047857' },
+                bgcolor: "#059669",
+                "&:hover": { bgcolor: "#047857" },
                 mt: 2,
               }}
             >
@@ -238,7 +273,7 @@ const Dashboard = () => {
                     </Typography>
 
                     <IconWrapper>
-                      <Description sx={{ color: '#059669' }} />
+                      <Description sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
                           Description
@@ -248,7 +283,7 @@ const Dashboard = () => {
                     </IconWrapper>
 
                     <IconWrapper>
-                      <CalendarMonth sx={{ color: '#059669' }} />
+                      <CalendarMonth sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
                           Date
@@ -258,7 +293,7 @@ const Dashboard = () => {
                     </IconWrapper>
 
                     <IconWrapper>
-                      <AccessTime sx={{ color: '#059669' }} />
+                      <AccessTime sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
                           Heure
@@ -268,7 +303,7 @@ const Dashboard = () => {
                     </IconWrapper>
 
                     <IconWrapper>
-                      <Business sx={{ color: '#059669' }} />
+                      <Business sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
                           Département
@@ -278,7 +313,7 @@ const Dashboard = () => {
                     </IconWrapper>
 
                     <IconWrapper>
-                      <Person sx={{ color: '#059669' }} />
+                      <Person sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
                           Citoyen
@@ -288,7 +323,7 @@ const Dashboard = () => {
                     </IconWrapper>
 
                     <IconWrapper>
-                      <Phone sx={{ color: '#059669' }} />
+                      <Phone sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
                           Téléphone
@@ -297,10 +332,20 @@ const Dashboard = () => {
                       </Box>
                     </IconWrapper>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        mt: 2,
+                      }}
+                    >
                       <Chip
                         label={`Statut: ${reservation.status}`}
-                        color={reservation.status === 'En attente' ? 'warning' : 'success'}
+                        color={
+                          reservation.status === "En attente"
+                            ? "warning"
+                            : "success"
+                        }
                       />
                     </Box>
                   </StyledCardContent>
@@ -310,16 +355,28 @@ const Dashboard = () => {
           </Grid>
         )}
 
-        {/* Reservation Modal */}
-        <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="sm" fullWidth>
+        <Dialog
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          maxWidth="sm"
+          fullWidth
+        >
           <DialogTitle>Créer une Nouvelle Réservation</DialogTitle>
           <DialogContent>
-            <TextField
+            <Autocomplete
               fullWidth
-              label="Description"
-              name="description"
+              options={reservationReasons}
               value={newReservation.description}
-              onChange={(e) => setNewReservation({ ...newReservation, [e.target.name]: e.target.value })}
+              onChange={(event, newValue) => {
+                setNewReservation({ ...newReservation, description: newValue });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Motif de la réservation"
+                  name="description"
+                />
+              )}
               margin="normal"
             />
             <TextField
@@ -328,7 +385,12 @@ const Dashboard = () => {
               type="date"
               name="date"
               value={newReservation.date}
-              onChange={(e) => setNewReservation({ ...newReservation, [e.target.name]: e.target.value })}
+              onChange={(e) =>
+                setNewReservation({
+                  ...newReservation,
+                  [e.target.name]: e.target.value,
+                })
+              }
               margin="normal"
               InputLabelProps={{ shrink: true }}
             />
@@ -338,7 +400,12 @@ const Dashboard = () => {
               type="time"
               name="time"
               value={newReservation.time}
-              onChange={(e) => setNewReservation({ ...newReservation, [e.target.name]: e.target.value })}
+              onChange={(e) =>
+                setNewReservation({
+                  ...newReservation,
+                  [e.target.name]: e.target.value,
+                })
+              }
               margin="normal"
               InputLabelProps={{ shrink: true }}
             />
@@ -348,7 +415,12 @@ const Dashboard = () => {
                 name="department"
                 value={newReservation.department}
                 label="Département"
-                onChange={(e) => setNewReservation({ ...newReservation, [e.target.name]: e.target.value })}
+                onChange={(e) =>
+                  setNewReservation({
+                    ...newReservation,
+                    [e.target.name]: e.target.value,
+                  })
+                }
               >
                 {departments.map((dept) => (
                   <MenuItem key={dept.id} value={dept.nomdepart}>
@@ -362,7 +434,12 @@ const Dashboard = () => {
               label="Numéro de Téléphone"
               name="phone"
               value={newReservation.phone}
-              onChange={(e) => setNewReservation({ ...newReservation, [e.target.name]: e.target.value })}
+              onChange={(e) =>
+                setNewReservation({
+                  ...newReservation,
+                  [e.target.name]: e.target.value,
+                })
+              }
               margin="normal"
             />
           </DialogContent>
@@ -371,7 +448,7 @@ const Dashboard = () => {
             <Button
               onClick={handleCreateReservation}
               variant="contained"
-              sx={{ bgcolor: '#059669', '&:hover': { bgcolor: '#047857' } }}
+              sx={{ bgcolor: "#059669", "&:hover": { bgcolor: "#047857" } }}
             >
               Créer
             </Button>
@@ -383,12 +460,12 @@ const Dashboard = () => {
           open={snackbarOpen}
           autoHideDuration={6000}
           onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
           <Alert
             onClose={() => setSnackbarOpen(false)}
             severity={snackbarSeverity}
-            sx={{ width: '100%' }}
+            sx={{ width: "100%" }}
           >
             {snackbarMessage}
           </Alert>
