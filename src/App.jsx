@@ -1,20 +1,18 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Dashboard from "./components/Dashboard";
-import ReservationForm from "./components/ReservationForm";
-import ChefDashboard from "./components/ChefDashboard";
-import AdminDashboard from "./components/AdminDashboard";
-import Home from "./components/Home";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import Translator from "./components/Translator";
+import { Login } from "./components/Login";
+import { Register } from "./components/Register";
+import { Dashboard } from "./components/Dashboard";
+import { ReservationForm } from "./components/ReservationForm";
+import { ChefDashboard } from "./components/ChefDashboard";
+import { AdminDashboard } from "./components/AdminDashboard";
+import { Home } from "./components/Home";
+import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
+import { Translator } from "./components/Translator";
 
-import "./styles.css";
-
-function App() {
+export function App() {
   const user = useSelector((state) => state.user);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -75,5 +73,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;

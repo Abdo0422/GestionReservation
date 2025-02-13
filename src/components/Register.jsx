@@ -13,6 +13,8 @@ import { useDispatch } from "react-redux";
 import { login } from "../features/actions";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
+import Translate from "./Translate";
+
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: "2rem 3rem",
@@ -50,7 +52,7 @@ const ModalBox = styled(Box)(({ theme }) => ({
   marginTop: "10vh",
 }));
 
-const Register = () => {
+export const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -146,43 +148,43 @@ const Register = () => {
     }
   };
 
-  return (
+return (
     <Container maxWidth="sm">
       <StyledPaper>
         <Typography variant="h4" align="center" sx={{ mb: 3, fontWeight: 600 }}>
-          Inscription
+          <Translate textKey="inscription" />
         </Typography>
         <form onSubmit={handleSubmit}>
           <StyledTextField
             fullWidth
-            label="Nom d'utilisateur"
+            label={<Translate textKey="username" />}
             type="text"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
           />
           <StyledTextField
             fullWidth
-            label="Email"
+            label={<Translate textKey="email" />}
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />
           <StyledTextField
             fullWidth
-            label="Mot de passe"
+            label={<Translate textKey="password" />}
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
           <StyledTextField
             fullWidth
-            label="Confirmer le mot de passe"
+            label={<Translate textKey="confirmPassword" />}
             type="password"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
           />
           <StyledButton fullWidth type="submit">
-            S'inscrire
+            <Translate textKey="register" />
           </StyledButton>
           {error && (
             <Typography color="error" variant="body2">
@@ -203,11 +205,11 @@ const Register = () => {
       <StyledModal open={openModal}>
         <ModalBox>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Entrez le code de vérification
+            <Translate textKey="enterVerificationCode" />
           </Typography>
           <StyledTextField
             fullWidth
-            label="Code de vérification"
+            label={<Translate textKey="verificationCode" />}
             type="text"
             value={verificationCode}
             onChange={(event) => setVerificationCode(event.target.value)}
@@ -217,7 +219,11 @@ const Register = () => {
             onClick={handleVerifyCode}
             disabled={isVerifying}
           >
-            {isVerifying ? "Vérification en cours..." : "Vérifier"}
+            {isVerifying ? (
+              <Translate textKey="verifying" />
+            ) : (
+              <Translate textKey="verify" />
+            )}
           </StyledButton>
           {error && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
@@ -229,5 +235,3 @@ const Register = () => {
     </Container>
   );
 };
-
-export default Register;

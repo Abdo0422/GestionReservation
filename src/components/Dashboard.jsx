@@ -35,6 +35,8 @@ import axios from "../features/axios";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import "dayjs/locale/fr";
+import Translate from "./Translate";
+
 
 dayjs.locale("fr");
 
@@ -95,7 +97,7 @@ const HeaderBox = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Dashboard = () => {
+export const Dashboard = () => {
   const user = useSelector((state) => state.user);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -129,7 +131,7 @@ const Dashboard = () => {
       try {
         if (user && user.name) {
           const response = await axios.get("/reservations/user", {
-            params: { name: user.name },
+            params: { username: user.name },
           });
           setReservations(response.data);
         } else {
@@ -185,14 +187,25 @@ const Dashboard = () => {
       const response = await axios.post("/reservations", reservationData);
       setReservations([...reservations, response.data]);
       setOpenModal(false);
-      setSnackbarMessage("Réservation créée avec succès!");
+      setSnackbarMessage(<Translate textKey="reservationCreated" />);
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
       setTimeout(() => {
-        window.location.reload();
+        window.location.reload(); 
       }, 5000);
+
     } catch (error) {
-      setSnackbarMessage("Erreur lors de la création de la réservation.");
+      console.error("Erreur lors de la création de la réservation :", error); 
+      let errorMessage = <Translate textKey="reservationError" />; 
+      if (error.response) {
+        errorMessage = error.response.data.error || errorMessage; 
+      } else if (error.request) {
+        errorMessage = <Translate textKey="noServerResponse" />;
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+
+      setSnackbarMessage(errorMessage);
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
@@ -221,10 +234,10 @@ const Dashboard = () => {
             gutterBottom
             fontWeight="bold"
           >
-            Tableau de Bord des Réservations
+            <Translate textKey="reservationDashboard" /> 
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
-            Gérez vos réservations au Tribunal de Commerce de Casablanca
+            <Translate textKey="manageReservations" />
           </Typography>
           <Button
             variant="contained"
@@ -237,7 +250,7 @@ const Dashboard = () => {
               py: 1.5,
             }}
           >
-            Nouvelle Réservation
+            <Translate textKey="newReservation" />
           </Button>
         </HeaderBox>
 
@@ -269,14 +282,14 @@ const Dashboard = () => {
                 <StyledCard>
                   <StyledCardContent>
                     <Typography variant="h6" gutterBottom fontWeight="bold">
-                      Détails de la Réservation
+                      <Translate textKey="reservationDetails" />
                     </Typography>
 
                     <IconWrapper>
                       <Description sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Description
+                          <Translate textKey="description" /> {/* Translated */}
                         </Typography>
                         <Typography>{reservation.description}</Typography>
                       </Box>
@@ -286,7 +299,7 @@ const Dashboard = () => {
                       <CalendarMonth sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Date
+                          <Translate textKey="date" /> {/* Translated */}
                         </Typography>
                         <Typography>{reservation.date}</Typography>
                       </Box>
@@ -296,7 +309,7 @@ const Dashboard = () => {
                       <AccessTime sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Heure
+                          <Translate textKey="time" /> {/* Translated */}
                         </Typography>
                         <Typography>{reservation.time}</Typography>
                       </Box>
@@ -306,7 +319,7 @@ const Dashboard = () => {
                       <Business sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Département
+                          <Translate textKey="department" /> {/* Translated */}
                         </Typography>
                         <Typography>{reservation.department}</Typography>
                       </Box>
@@ -316,7 +329,7 @@ const Dashboard = () => {
                       <Person sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Citoyen
+                          <Translate textKey="citizen" /> {/* Translated */}
                         </Typography>
                         <Typography>{reservation.citizen}</Typography>
                       </Box>
@@ -326,7 +339,7 @@ const Dashboard = () => {
                       <Phone sx={{ color: "#059669" }} />
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Téléphone
+                          <Translate textKey="phone" /> {/* Translated */}
                         </Typography>
                         <Typography>{reservation.phone}</Typography>
                       </Box>
@@ -340,12 +353,8 @@ const Dashboard = () => {
                       }}
                     >
                       <Chip
-                        label={`Statut: ${reservation.status}`}
-                        color={
-                          reservation.status === "En attente"
-                            ? "warning"
-                            : "success"
-                        }
+                        label={<Translate textKey={reservation.status === "En attente" ? "pending" : "confirmed"} />}
+                        color={reservation.status === "En attente" ? "warning" : "success"}
                       />
                     </Box>
                   </StyledCardContent>
@@ -361,7 +370,7 @@ const Dashboard = () => {
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle>Créer une Nouvelle Réservation</DialogTitle>
+          <DialogTitle><Translate textKey="createReservation" /></DialogTitle>
           <DialogContent>
             <Autocomplete
               fullWidth
@@ -373,7 +382,7 @@ const Dashboard = () => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Motif de la réservation"
+                  label={<Translate textKey="reservationReason" />} // Translated label
                   name="description"
                 />
               )}
@@ -381,7 +390,7 @@ const Dashboard = () => {
             />
             <TextField
               fullWidth
-              label="Date"
+              label={<Translate textKey="date" />} // Translated label
               type="date"
               name="date"
               value={newReservation.date}
@@ -396,7 +405,7 @@ const Dashboard = () => {
             />
             <TextField
               fullWidth
-              label="Heure"
+              label={<Translate textKey="time" />} // Translated label
               type="time"
               name="time"
               value={newReservation.time}
@@ -410,11 +419,11 @@ const Dashboard = () => {
               InputLabelProps={{ shrink: true }}
             />
             <FormControl fullWidth margin="normal">
-              <InputLabel>Département</InputLabel>
+              <InputLabel><Translate textKey="department" /></InputLabel> {/* Translated label */}
               <Select
                 name="department"
                 value={newReservation.department}
-                label="Département"
+                label={<Translate textKey="department" />} // Translated label
                 onChange={(e) =>
                   setNewReservation({
                     ...newReservation,
@@ -431,7 +440,7 @@ const Dashboard = () => {
             </FormControl>
             <TextField
               fullWidth
-              label="Numéro de Téléphone"
+              label={<Translate textKey="phoneNumber" />} // Translated label
               name="phone"
               value={newReservation.phone}
               onChange={(e) =>
@@ -444,13 +453,13 @@ const Dashboard = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenModal(false)}>Annuler</Button>
+            <Button onClick={() => setOpenModal(false)}><Translate textKey="cancel" /></Button>
             <Button
               onClick={handleCreateReservation}
               variant="contained"
               sx={{ bgcolor: "#059669", "&:hover": { bgcolor: "#047857" } }}
             >
-              Créer
+              <Translate textKey="create" />
             </Button>
           </DialogActions>
         </Dialog>
@@ -474,5 +483,3 @@ const Dashboard = () => {
     </Box>
   );
 };
-
-export default Dashboard;

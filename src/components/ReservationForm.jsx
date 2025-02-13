@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button } from '@mui/material';
 import axios from '../features/axios';
 
-const ReservationForm = () => {
+export const ReservationForm = () => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -54,4 +54,3 @@ const ReservationForm = () => {
   );
 };
 
-export default ReservationForm;

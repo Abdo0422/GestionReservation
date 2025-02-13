@@ -28,6 +28,8 @@ import axios from "../features/axios";
 import dayjs from "dayjs";
 import "dayjs/locale/fr";
 dayjs.locale("fr");
+import Translate from "./Translate";
+import { formatDate } from "../features/translations/formatDate";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: "1rem",
@@ -43,7 +45,7 @@ const CardContentStyled = styled(CardContent)(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-const ChefDashboard = () => {
+export const ChefDashboard = () => {
   const user = useSelector((state) => state.user);
   const [reservations, setReservations] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -268,7 +270,6 @@ const ChefDashboard = () => {
     }
   };
 
-  const formatDate = (dateString) => dayjs(dateString).format("D MMM YYYY");
   const formatTime = (timeString) =>
     dayjs(timeString, "HH:mm:ss").format("HH:mm");
 
@@ -281,7 +282,6 @@ const ChefDashboard = () => {
         minHeight="60vh"
       >
         <CircularProgress sx={{ color: theme.palette.primary.main }} />{" "}
-        {/* Use theme color */}
       </Box>
     );
   }
@@ -289,8 +289,6 @@ const ChefDashboard = () => {
   if (errorReservations || errorEmployees) {
     return (
       <Typography variant="h6" color="error" textAlign="center" mt={4}>
-        {" "}
-        {/* Centered error */}
         {errorReservations || errorEmployees}
       </Typography>
     );
@@ -311,14 +309,13 @@ const ChefDashboard = () => {
           transition: "color 0.3s",
         }}
       >
-        Bonjour {user.name}, Chef du département {departmentName}
+        <Translate textKey="helloChef" values={{ name: user.name, department: departmentName }} />
       </Typography>
       <Typography
         variant="body1"
         sx={{ textAlign: "center", color: "text.secondary", mb: 5 }}
       >
-        Bienvenue sur votre tableau de bord. Ici, vous pouvez gérer les
-        réservations et les employés de votre département.
+        <Translate textKey="chefDashboardWelcome" />
       </Typography>
       {/* Reservations Section */}
       <Box sx={{ mb: 6 }}>
@@ -328,7 +325,7 @@ const ChefDashboard = () => {
           gutterBottom
           sx={{ mt: 0, fontWeight: "bold" }}
         >
-          Liste des réservations
+          <Translate textKey="reservationList" />
         </Typography>
         <Typography
           variant="body2"
@@ -336,9 +333,7 @@ const ChefDashboard = () => {
           gutterBottom
           sx={{ mb: 2 }}
         >
-          Consultez, confirmez et suivez les réservations de votre département.
-          Vous pouvez également assigner des employés aux réservations en
-          attente.
+          <Translate textKey="reservationDescription" />
         </Typography>
         <Divider sx={{ mb: 3 }} />
         <Grid container spacing={3}>
@@ -355,22 +350,22 @@ const ChefDashboard = () => {
                     {reservation.description}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Date: {formatDate(reservation.date)}
+                    <Translate textKey="date" />: {formatDate(reservation.date)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Heure: {reservation.time}
+                    <Translate textKey="time" />: {reservation.time}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Département: {reservation.department}
+                    <Translate textKey="department" />: {reservation.department}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Nom du Citoyen: {reservation.citizen}
+                    <Translate textKey="citizenName" />: {reservation.citizen}
                   </Typography>
 
                   <Box sx={{ mt: 2, display: "flex", flexDirection: "column" }}>
                     {reservation.status && (
                       <Chip
-                        label={reservation.status}
+                        label={<Translate textKey={reservation.status === "En attente" ? "pending" : "confirmed"} />}
                         color={
                           reservation.status === "Confirmé"
                             ? "success"
@@ -394,15 +389,15 @@ const ChefDashboard = () => {
                           alignSelf: isMobile ? "stretch" : "flex-start",
                         }}
                       >
-                        <InputLabel>Assigner Employé</InputLabel>
+                        <InputLabel><Translate textKey="assignEmployee" /></InputLabel>
                         <Select
-                          label="Assigner Employé"
+                          label={<Translate textKey="assignEmployee" />}
                           onChange={(e) =>
                             handleAssignEmployee(reservation.id, e.target.value)
                           }
                           defaultValue=""
                         >
-                          <MenuItem value="">Choisir un employé</MenuItem>
+                          <MenuItem value=""><Translate textKey="chooseEmployee" /></MenuItem>
                           {employees.map((employee) => (
                             <MenuItem key={employee.id} value={employee.id}>
                               {employee.name}
@@ -418,66 +413,49 @@ const ChefDashboard = () => {
           ))}
         </Grid>
       </Box>
+      
       {/* Employees Section */}
-      <Typography
-        variant="h5"
-        component="h2"
-        gutterBottom
-        sx={{ mt: 0, fontWeight: "bold" }}
-      >
-        Liste des employés
+      <Typography variant="h5" component="h2" gutterBottom sx={{ mt: 0, fontWeight: "bold" }}>
+        <Translate textKey="employeeList" /> 
       </Typography>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        gutterBottom
-        sx={{ mb: 2 }}
-      >
-        Gérez les informations de vos employés. Vous pouvez ajouter, modifier ou
-        supprimer des employés de votre département.
+      <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+        <Translate textKey="employeeDescription" />
       </Typography>
       <Divider sx={{ mb: 3 }} />
       <Button
         variant="contained"
         color="primary"
         onClick={() => setOpenCreateEmployee(true)}
-        sx={{ position: "relative", right: "0", mb: 3 }} // Moved button, made relative
+        sx={{ position: "relative", right: "0", mb: 3 }}
       >
-        Créer un nouvel employé
+        <Translate textKey="createEmployee" />
       </Button>
       <Grid container spacing={3}>
         {employees.map((employee) => (
           <Grid item key={employee.id} xs={12} sm={6} md={4} lg={3}>
             <StyledCard>
               <CardContentStyled>
-                <Typography
-                  variant="h6"
-                  component="h3"
-                  gutterBottom
-                  sx={{ fontWeight: "bold" }}
-                >
+                <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: "bold" }}>
                   {employee.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Rôle: {employee.role}
+                  <Translate textKey="role" />: {employee.role} 
                 </Typography>
-                <Box
-                  sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}
-                >
+                <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
                   <Button
                     variant="contained"
                     color="primary"
                     onClick={() => handleOpenUpdateModal(employee)}
                     sx={{ mr: 1 }}
                   >
-                    Modifier
+                    <Translate textKey="edit" /> 
                   </Button>
                   <Button
                     variant="contained"
                     color="error"
                     onClick={() => handleDeleteEmployee(employee.id)}
                   >
-                    Supprimer
+                    <Translate textKey="delete" /> 
                   </Button>
                 </Box>
               </CardContentStyled>
@@ -497,25 +475,21 @@ const ChefDashboard = () => {
           },
         }}
       >
-        <DialogTitle
-          sx={{
-            fontWeight: 600,
-            fontSize: "1.5rem",
-            padding: "1.5rem 2rem",
-            borderBottom: "1px solid #e0e0e0",
-            color: "#333",
-          }}
-        >
-          Créer un nouvel employé
+        <DialogTitle sx={{
+          fontWeight: 600,
+          fontSize: "1.5rem",
+          padding: "1.5rem 2rem",
+          borderBottom: "1px solid #e0e0e0",
+          color: "#333",
+        }}>
+          <Translate textKey="createEmployee" /> 
         </DialogTitle>
         <DialogContent sx={{ padding: "2rem" }}>
           <Box component="form" noValidate onSubmit={handleCreateEmployee}>
-            {" "}
-            {/* Form for submission */}
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label="Nom"
+                  label={<Translate textKey="name" />} 
                   fullWidth
                   name="name"
                   value={newEmployeeData.name}
@@ -527,7 +501,7 @@ const ChefDashboard = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Téléphone"
+                  label={<Translate textKey="phone" />} 
                   fullWidth
                   name="telephone"
                   value={newEmployeeData.telephone}
@@ -538,7 +512,7 @@ const ChefDashboard = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Email"
+                  label={<Translate textKey="email" />} 
                   fullWidth
                   name="email"
                   value={newEmployeeData.email}
@@ -550,7 +524,7 @@ const ChefDashboard = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Âge"
+                  label={<Translate textKey="age" />} 
                   fullWidth
                   name="age"
                   value={newEmployeeData.age}
@@ -562,9 +536,9 @@ const ChefDashboard = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Département</InputLabel>
+                  <InputLabel><Translate textKey="department" /></InputLabel> 
                   <TextField
-                    label="Département"
+                    label={<Translate textKey="department" />} 
                     value={departmentName}
                     disabled
                     InputLabelProps={{ shrink: true }}
@@ -574,11 +548,9 @@ const ChefDashboard = () => {
             </Grid>
           </Box>
         </DialogContent>
-        <DialogActions
-          sx={{ padding: "1rem 2rem", borderTop: "1px solid #e0e0e0" }}
-        >
+        <DialogActions sx={{ padding: "1rem 2rem", borderTop: "1px solid #e0e0e0" }}>
           <Button onClick={() => setOpenCreateEmployee(false)} color="grey">
-            Annuler
+            <Translate textKey="cancel" /> 
           </Button>
           <Button
             type="submit"
@@ -586,10 +558,11 @@ const ChefDashboard = () => {
             variant="contained"
             color="primary"
           >
-            Créer
+            <Translate textKey="create" /> 
           </Button>
         </DialogActions>
       </Dialog>
+      
       <Dialog
         open={openUpdateEmployee}
         onClose={() => setOpenUpdateEmployee(false)}
@@ -601,16 +574,14 @@ const ChefDashboard = () => {
           },
         }}
       >
-        <DialogTitle
-          sx={{
-            fontWeight: 600,
-            fontSize: "1.5rem",
-            padding: "1.5rem 2rem",
-            borderBottom: "1px solid #e0e0e0",
-            color: "#333",
-          }}
-        >
-          Modifier l'employé
+        <DialogTitle sx={{
+          fontWeight: 600,
+          fontSize: "1.5rem",
+          padding: "1.5rem 2rem",
+          borderBottom: "1px solid #e0e0e0",
+          color: "#333",
+        }}>
+          <Translate textKey="editEmployee" /> 
         </DialogTitle>
         <DialogContent sx={{ padding: "2rem" }}>
           {employeeToUpdate && (
@@ -618,7 +589,7 @@ const ChefDashboard = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
-                    label="Nom"
+                    label={<Translate textKey="name" />} 
                     fullWidth
                     name="name"
                     value={employeeToUpdate.name}
@@ -630,7 +601,7 @@ const ChefDashboard = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    label="Téléphone"
+                    label={<Translate textKey="phone" />} 
                     fullWidth
                     name="telephone"
                     value={employeeToUpdate.telephone}
@@ -641,19 +612,19 @@ const ChefDashboard = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    label="Email"
+                    label={<Translate textKey="email" />} 
                     fullWidth
                     name="email"
                     value={employeeToUpdate.email}
                     onChange={handleInputChange}
                     margin="normal"
-                    type="email" // Email validation
+                    type="email"
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    label="Âge"
+                    label={<Translate textKey="age" />} 
                     fullWidth
                     name="age"
                     value={employeeToUpdate.age}
@@ -665,9 +636,9 @@ const ChefDashboard = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl fullWidth margin="normal">
-                    <InputLabel>Département</InputLabel>
+                    <InputLabel><Translate textKey="department" /></InputLabel> 
                     <TextField
-                      label="Département"
+                      label={<Translate textKey="department" />} 
                       value={departmentName}
                       disabled
                       InputLabelProps={{ shrink: true }}
@@ -678,19 +649,12 @@ const ChefDashboard = () => {
             </Box>
           )}
         </DialogContent>
-        <DialogActions
-          sx={{ padding: "1rem 2rem", borderTop: "1px solid #e0e0e0" }}
-        >
+        <DialogActions sx={{ padding: "1rem 2rem", borderTop: "1px solid #e0e0e0" }}>
           <Button onClick={() => setOpenUpdateEmployee(false)} color="grey">
-            Annuler
+            <Translate textKey="cancel" /> 
           </Button>
-          <Button
-            type="submit"
-            onClick={handleUpdateEmployee}
-            variant="contained"
-            color="primary"
-          >
-            Enregistrer
+          <Button type="submit" onClick={handleUpdateEmployee} variant="contained" color="primary">
+            <Translate textKey="save" /> 
           </Button>
         </DialogActions>
       </Dialog>
@@ -711,7 +675,7 @@ const ChefDashboard = () => {
             color: "#333",
           }}
         >
-          Notification
+          <Translate textKey="notification" />
         </DialogTitle>
         <DialogContent sx={{ padding: "1.5rem" }}>
           <Typography variant="body1" color="textSecondary">
@@ -720,12 +684,10 @@ const ChefDashboard = () => {
         </DialogContent>
         <DialogActions sx={{ padding: "1rem 1.5rem" }}>
           <Button onClick={() => setOpenPopup(false)} color="primary">
-            Fermer
+            <Translate textKey="close" />
           </Button>
         </DialogActions>
       </Dialog>
     </Container>
   );
 };
-
-export default ChefDashboard;

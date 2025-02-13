@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { login } from "../features/actions";
-import axios from "axios";
+import axios from "../features/axios";
+import Translate from "./Translate";
 
-// Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: "20px 30px",
   borderRadius: "10px",
@@ -33,13 +33,20 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const Login = () => {
+export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'fr');
+  const isArabic = language === 'ar';
 
+  useEffect(() => {
+    localStorage.setItem("language", language);
+    console.log("languagenow", language);
+  }, [language]);
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -47,7 +54,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "https://3z82zf-5000.csb.app/api/login",
+        "/login",
         { email, password }
       );
 
@@ -66,7 +73,7 @@ const Login = () => {
       console.error("Erreur de connexion:", error);
       setError(
         error.response?.data?.error ||
-          "Une erreur s'est produite lors de la connexion."
+          <Translate textKey="loginError" />
       );
     } finally {
       setLoading(false);
@@ -77,14 +84,14 @@ const Login = () => {
     <Container maxWidth="sm">
       <StyledPaper>
         <Typography variant="h4" align="center" sx={{ mb: 3, fontWeight: 600 }}>
-          Connexion
+          <Translate textKey="connexion" />
         </Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Email"
+                label={<Translate textKey="email" />}
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -95,7 +102,7 @@ const Login = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Mot de passe"
+                label={<Translate textKey="password" />}
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -108,7 +115,7 @@ const Login = () => {
                 {loading ? (
                   <CircularProgress size={24} color="inherit" />
                 ) : (
-                  "Se connecter"
+                  <Translate textKey="login" />
                 )}
               </StyledButton>
             </Grid>
@@ -125,5 +132,3 @@ const Login = () => {
     </Container>
   );
 };
-
-export default Login;

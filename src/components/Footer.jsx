@@ -18,7 +18,7 @@ const StyledFooter = styled(Box)(({ theme }) => ({
   padding: "64px 0 32px 0",
   position: "relative",
   overflow: "hidden",
-  marginTop: "50px",
+  marginTop: "80px",
 }));
 
 const FooterLink = styled(Typography)({
@@ -48,7 +48,7 @@ const NewsletterForm = styled(Box)({
   marginTop: "24px",
 });
 
-const Footer = () => {
+export const Footer = () => {
   const [email, setEmail] = useState("");
   const [subscribeSuccess, setSubscribeSuccess] = useState(false);
 
@@ -194,5 +194,3 @@ const Footer = () => {
     </StyledFooter>
   );
 };
-
-export default Footer;
