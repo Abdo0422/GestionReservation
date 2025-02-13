@@ -158,7 +158,7 @@ def register():
 
     users.append(new_user)
     save_users()
-    return jsonify({"message": "Inscription réussie"}), 201
+    return jsonify({"message": "Inscription réussie", "email":email}), 201
 
 @app.route('/api/verify', methods=['POST'])
 def verify():
