@@ -52,6 +52,7 @@ def save_reservations():
         json.dump(reservations, f, indent=2)
 
 
+
 def get_user_by_credentials(email, password):
     """Authenticate user by email and password."""
     for user in users:
@@ -271,23 +272,72 @@ def get_user_reservations():
         return jsonify({"error": "Nom d'utilisateur non trouvé"}), 404  
 
 
-@app.route('/api/departments', methods=['GET']) 
-def get_departments():
+@app.route('/api/departments', methods=['GET', 'POST'])
+def manage_departments():
     with open('data/departements.json') as f:
         departments = json.load(f)
-    return jsonify(departments)
 
-@app.route('/api/departments/<int:numdep>', methods=['GET'])
-def get_department_by_numdep(numdep):
+    if request.method == 'GET':
+        return jsonify(departments), 200
+
+    if request.method == 'POST':
+        data = request.json
+        nomdepart = data.get('nomdepart')
+
+        if not nomdepart: 
+            return jsonify({"error": "nomdepart is required"}), 400
+
+        if departments:
+            new_id = max(dept['id'] for dept in departments) + 1
+        else:
+            new_id = 1
+
+        new_department = {
+            "id": new_id,
+            "nomdepart": nomdepart
+        }
+
+        departments.append(new_department)
+
+        with open('data/departements.json', 'w') as f:
+            json.dump(departments, f, indent=2)
+
+        return jsonify(new_department), 201
+
+
+@app.route('/api/departments/<int:numdep>', methods=['GET', 'PUT', 'DELETE'])
+def manage_department(numdep):
     with open('data/departements.json') as f:
         departments = json.load(f)
 
     department = next((dept for dept in departments if dept['id'] == numdep), None)
-
-    if department:
-        return jsonify(department), 200
-    else:
+    if not department:
         return jsonify({"error": "Department not found"}), 404
+
+    if request.method == 'GET':
+        return jsonify(department), 200
+
+    if request.method == 'PUT':
+        data = request.json
+        nomdepart = data.get('nomdepart')
+
+        if not nomdepart:
+            return jsonify({"error": "nomdepart is required for update"}), 400
+
+        department['nomdepart'] = nomdepart  # Update nomdepart
+
+        with open('data/departements.json', 'w') as f:
+            json.dump(departments, f, indent=2)
+
+        return jsonify(department), 200
+
+    if request.method == 'DELETE':
+        departments.remove(department)
+
+        with open('data/departements.json', 'w') as f:
+            json.dump(departments, f, indent=2)
+
+        return jsonify({"message": "Department deleted"}), 200
 
 
 @app.route('/api/chef/reservations', methods=['GET'])
@@ -584,6 +634,9 @@ def update_reservation_status(reservation_id):
         return jsonify({"error": "Reservation not found"}), 404
 
     reservation['status'] = status
+
+    if status == "En attente":
+        reservation['employee_assigned'] = ""
 
     save_reservations()
 

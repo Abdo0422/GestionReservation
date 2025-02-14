@@ -10,8 +10,8 @@
   {
     "id": 2,
     "name": "employee",
-    "email": "employee@email.com",
-    "password": "$2b$12$cKyoBpjYwAXrybrqaHCyheHdbGyoV7QDabrfLhEtDqqYVu.JWkYKe",
+    "email": "employee1@email.com",
+    "password": "$2b$12$bNMu5QQKFMe3Uexkn5dgHOtHrE6g4c7sfvJNZvxqNN4bOJNsBJclW",
     "role": "citoyen",
     "numdep": 99
   },
@@ -22,6 +22,16 @@
     "password": "$2b$12$EwRCOOTtUPhR0bMK1j7pSuVN3.Su8aLpb.jH.SlRQW9eTyvlWp31i",
     "role": "chef",
     "numdep": 1,
+    "verified": true,
+    "verification_code": null
+  },
+  {
+    "id": 4,
+    "name": "Samir",
+    "email": "aistories247@gmail.com",
+    "password": "$2b$12$V32IvT7WDL7oLHwUIh5DKeGwM9SK/qDTbvm/oAOkV9Aq1Hmqe7x32",
+    "role": "chef",
+    "numdep": 4,
     "verified": true,
     "verification_code": null
   }
