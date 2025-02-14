@@ -69,9 +69,12 @@ export const ChefDashboard = () => {
     department: "",
     role: "employee",
   });
+  const [newEmployeeErrors, setNewEmployeeErrors] = useState({});
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const [isCreating, setIsCreating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const decodeText = (text) => {
     try {
       return decodeURIComponent(text);
@@ -209,19 +212,81 @@ export const ChefDashboard = () => {
     }
   };
 
-  const handleCreateEmployee = async () => {
+  const handleCreateEmployee = async (event) => {
+    event.preventDefault();
+    let hasErrors = false;
+    const errors = {};
+
+    if (!newEmployeeData.name) {
+      errors.name = <Translate textKey="requiredField" />;
+      hasErrors = true;
+    }
+    if (!newEmployeeData.telephone) {
+      errors.telephone = <Translate textKey="requiredField" />;
+      hasErrors = true;
+    } else if (!/^\d+$/.test(newEmployeeData.telephone)) {   
+      errors.telephone = <Translate textKey="invalidPhone" />;
+      hasErrors = true;
+    }
+    if (!newEmployeeData.email) {
+      errors.email = <Translate textKey="requiredField" />;
+      hasErrors = true;
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(newEmployeeData.email)) {
+      errors.email = <Translate textKey="invalidEmail" />;
+      hasErrors = true;
+    }
+    if (!newEmployeeData.age) {
+      errors.age = <Translate textKey="requiredField" />;
+      hasErrors = true;
+    } else if (isNaN(newEmployeeData.age) || newEmployeeData.age < 18 || newEmployeeData.age > 100) {
+      errors.age = <Translate textKey="invalidAge" />;
+      hasErrors = true;
+    }
+
+
+
+    setNewEmployeeErrors(errors); 
+
+    if (hasErrors) {
+      return; 
+    }
+
+    setIsLoading(true);
+
     try {
       const response = await axios.post("/chef/employees", newEmployeeData);
+
+      setNewEmployeeData({   
+        name: "",
+        telephone: "",
+        email: "",
+        age: "",
+        department: departmentName,
+        role: "employee",
+      });
+      setNewEmployeeErrors({});  
+      setIsCreating(false);
       setEmployees([...employees, response.data]);
-      setPopupMessage("Employé créé avec succès.");
+      setPopupMessage(<Translate textKey="employeeCreated" />);  
       setOpenPopup(true);
-      setOpenCreateEmployee(false); // Close the modal
+      setOpenCreateEmployee(false);
+
     } catch (error) {
-      console.error("Erreur lors de la création de l'employé:", error);
-      setPopupMessage("Erreur lors de la création de l'employé.");
+      console.error("Error creating employee:", error);
+      if (error.response) {
+        setPopupMessage(<Translate textKey="error" values={{ message: error.response.data.message || error.response.status }} />);  
+      } else if (error.request) {
+        setPopupMessage(<Translate textKey="noServerResponse" />);  
+      } else {
+        setPopupMessage(<Translate textKey="anErrorOccurred" />); 
+      }
       setOpenPopup(true);
+
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   const handleOpenUpdateModal = (employee) => {
     setEmployeeToUpdate({ ...employee });
@@ -273,7 +338,7 @@ export const ChefDashboard = () => {
   const formatTime = (timeString) =>
     dayjs(timeString, "HH:mm:ss").format("HH:mm");
 
-  if (loadingReservations || loadingEmployees) {
+  if (loadingReservations || loadingEmployees || loadingDepartment) {
     return (
       <Box
         display="flex"
@@ -317,6 +382,7 @@ export const ChefDashboard = () => {
       >
         <Translate textKey="chefDashboardWelcome" />
       </Typography>
+
       {/* Reservations Section */}
       <Box sx={{ mb: 6 }}>
         <Typography
@@ -335,6 +401,7 @@ export const ChefDashboard = () => {
         >
           <Translate textKey="reservationDescription" />
         </Typography>
+        
         <Divider sx={{ mb: 3 }} />
         <Grid container spacing={3}>
           {reservations.map((reservation) => (
@@ -425,7 +492,18 @@ export const ChefDashboard = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => setOpenCreateEmployee(true)}
+        onClick={() => {
+          setOpenCreateEmployee(true);
+          setIsCreating(true); 
+          setNewEmployeeData({
+            name: "",
+            telephone: "",
+            email: "",
+            age: "",
+            department: "",
+            role: "employee",
+          });
+        }}
         sx={{ position: "relative", right: "0", mb: 3 }}
       >
         <Translate textKey="createEmployee" />
@@ -463,102 +541,61 @@ export const ChefDashboard = () => {
           </Grid>
         ))}
       </Grid>
+      
            
-      <Dialog
-        open={openCreateEmployee}
-        onClose={() => setOpenCreateEmployee(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: "8px",
-          },
-        }}
-      >
-        <DialogTitle sx={{
-          fontWeight: 600,
-          fontSize: "1.5rem",
-          padding: "1.5rem 2rem",
-          borderBottom: "1px solid #e0e0e0",
-          color: "#333",
-        }}>
-          <Translate textKey="createEmployee" /> 
-        </DialogTitle>
-        <DialogContent sx={{ padding: "2rem" }}>
-          <Box component="form" noValidate onSubmit={handleCreateEmployee}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  label={<Translate textKey="name" />} 
-                  fullWidth
-                  name="name"
-                  value={newEmployeeData.name}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label={<Translate textKey="phone" />} 
-                  fullWidth
-                  name="telephone"
-                  value={newEmployeeData.telephone}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label={<Translate textKey="email" />} 
-                  fullWidth
-                  name="email"
-                  value={newEmployeeData.email}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  type="email"
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label={<Translate textKey="age" />} 
-                  fullWidth
-                  name="age"
-                  value={newEmployeeData.age}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  type="number"
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel><Translate textKey="department" /></InputLabel> 
-                  <TextField
-                    label={<Translate textKey="department" />} 
-                    value={departmentName}
-                    disabled
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </FormControl>
-              </Grid>
-            </Grid>
-          </Box>
+      <Dialog open={openCreateEmployee} onClose={() => setOpenCreateEmployee(false)}>
+        <DialogTitle><Translate textKey="createEmployee" /></DialogTitle>
+        <DialogContent>
+          <TextField
+            label={<Translate textKey="name" />}
+            fullWidth
+            value={newEmployeeData.name}
+            onChange={(e) => setNewEmployeeData({ ...newEmployeeData, name: e.target.value })}
+            sx={{ mb: 2 }}
+            error={!!newEmployeeErrors.name} 
+            helperText={newEmployeeErrors.name}  
+          />
+          <TextField
+            label={<Translate textKey="phone" />}
+            fullWidth
+            value={newEmployeeData.telephone}
+            onChange={(e) => setNewEmployeeData({ ...newEmployeeData, telephone: e.target.value })}
+            sx={{ mb: 2 }}
+            error={!!newEmployeeErrors.telephone}
+            helperText={newEmployeeErrors.telephone}
+          />
+          <TextField
+            label={<Translate textKey="email" />}
+            fullWidth
+            value={newEmployeeData.email}
+            onChange={(e) => setNewEmployeeData({ ...newEmployeeData, email: e.target.value })}
+            sx={{ mb: 2 }}
+            error={!!newEmployeeErrors.email}
+            helperText={newEmployeeErrors.email}
+          />
+          <TextField
+            label={<Translate textKey="age" />}
+            fullWidth
+            value={newEmployeeData.age}
+            onChange={(e) => setNewEmployeeData({ ...newEmployeeData, age: e.target.value })}
+            sx={{ mb: 2 }}
+            error={!!newEmployeeErrors.age}
+            helperText={newEmployeeErrors.age}
+            type="number" 
+          />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel><Translate textKey="department" /></InputLabel>
+            <TextField
+              label={<Translate textKey="department" />}
+              value={departmentName}
+              disabled
+            />
+          </FormControl>
         </DialogContent>
-        <DialogActions sx={{ padding: "1rem 2rem", borderTop: "1px solid #e0e0e0" }}>
-          <Button onClick={() => setOpenCreateEmployee(false)} color="grey">
-            <Translate textKey="cancel" /> 
-          </Button>
-          <Button
-            type="submit"
-            onClick={handleCreateEmployee}
-            variant="contained"
-            color="primary"
-          >
-            <Translate textKey="create" /> 
+        <DialogActions>
+          <Button onClick={() => setOpenCreateEmployee(false)}><Translate textKey="cancel" /></Button>
+          <Button onClick={handleCreateEmployee} disabled={isLoading}> 
+            {isLoading ? <CircularProgress size={20} /> : <Translate textKey="create" />}
           </Button>
         </DialogActions>
       </Dialog>

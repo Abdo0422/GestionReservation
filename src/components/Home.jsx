@@ -202,3 +202,5 @@ export const Home = () => {
     </StyledBox>
   );
 };
+
+export default Home;
