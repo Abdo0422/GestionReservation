@@ -1,31 +1,31 @@
 [
   {
     "id": 1,
-    "nomdepart": "D\u00e9partement des affaires g\u00e9n\u00e9rales"
+    "nomdepart": "Section de l'Immobilier (قسم العقار)"
   },
   {
     "id": 2,
-    "nomdepart": "D\u00e9partement du contentieux"
+    "nomdepart": "Section des Difficultés des Entreprises (قسم صعوبة المقاولة)"
   },
   {
     "id": 3,
-    "nomdepart": "D\u00e9partement de l'ex\u00e9cution"
+    "nomdepart": "Section des Référés (قسم الاستعجال)"
   },
   {
     "id": 4,
-    "nomdepart": "D\u00e9partement de la comptabilit\u00e9"
+    "nomdepart": "Section de la Saisie-arrêt (قسم الحجز لدى الغير)"
   },
   {
     "id": 5,
-    "nomdepart": "D\u00e9partement des ressources humaines"
+    "nomdepart": "Section du Fond (قسم الموضوع)"
   },
   {
     "id": 6,
-    "nomdepart": "D\u00e9partement de l'informatique"
+    "nomdepart": "Section des Litiges Maritimes (قسم المنازعات البحرية)"
   },
   {
     "id": 7,
-    "nomdepart": "D\u00e9partement de la communication"
+    "nomdepart": "Section de la Propriété Intellectuelle (قسم الملكية الفكرية)"
   },
   {
     "id": 99,
