@@ -147,6 +147,7 @@ export const translations = {
         t1Text: "Ce site a rendu la prise de rendez-vous au tribunal tellement plus facile.  J'ai pu choisir la date et l'heure qui me convenaient sans avoir à me déplacer.  Un gain de temps précieux!",
         t2Name: "Ahmed Dubois",
         t2Text: "L'interface est très intuitive et la navigation est simple. J'ai trouvé toutes les informations dont j'avais besoin rapidement.  Je recommande vivement ce service.",
+      adminDashboardTitle: "Tableau de Bord Administrateur",
     },
     ar: {
         tribunalCommerce: "محكمة التجارية بالدار البيضاء",
@@ -293,5 +294,6 @@ export const translations = {
         t1Text: "لقد جعل هذا الموقع تحديد المواعيد في المحكمة أسهل بكثير. تمكنت من اختيار التاريخ والوقت الذي يناسبني دون الحاجة إلى الذهاب إلى هناك. إنه توفير ثمين للوقت!",
         t2Name: "أحمد دوبوا",
         t2Text: ".الواجهة بديهية للغاية والتنقل بسيط. لقد وجدت جميع المعلومات التي كنت بحاجة إليها بسرعة. أوصي بشدة بهذه الخدمة",
+      adminDashboardTitle: "لوحة قيادة المدير",
     }
 };
