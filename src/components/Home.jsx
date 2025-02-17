@@ -6,11 +6,10 @@ import {
   Typography,
   Button,
   styled,
-  Card,
-  CardMedia,
-  CardContent,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
-import moment from "moment";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/actions";
@@ -23,6 +22,8 @@ import {
   Building2,
 } from "lucide-react";
 import Translate from "./Translate";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useLanguage } from "../features/translations/LanguageContext";
 
 const StyledBox = styled(Box)(({ theme, language }) => ({
   minHeight: "100vh",
@@ -72,9 +73,41 @@ const StyledButton = styled(Button)(({ theme, language }) => ({
 export const Home = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [news, setNews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [expanded, setExpanded] = useState(false);
+  const { language } = useLanguage();
+  const handleChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false);
+  };
+
+  const qa = [
+    {
+      question: <Translate textKey="q1" />,
+      answer: <Translate textKey="a1" />,
+    },
+    {
+      question: <Translate textKey="q2" />,
+      answer: <Translate textKey="a2" />,
+    },
+    {
+      question: <Translate textKey="q3" />,
+      answer: <Translate textKey="a3" />,
+    },
+    {
+      question: <Translate textKey="q4" />,
+      answer: <Translate textKey="a4" />,
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: <Translate textKey="t1Name" />,
+      text: <Translate textKey="t1Text" />,
+    },
+    {
+      name: <Translate textKey="t2Name" />,
+      text: <Translate textKey="t2Text" />,
+    },
+  ];
 
   const handleLogout = () => {
     dispatch(logout());
@@ -159,6 +192,98 @@ export const Home = () => {
           </CardBox>
         </SectionBox>
 
+        {/* Q&A Section */}
+        <SectionBox
+          sx={{ mt: 16, direction: language === "ar" ? "rtl" : "ltr" }}
+        >
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#333",
+              mb: 4,
+              textAlign: "center",
+            }}
+          >
+            <Translate textKey="faq" />
+          </Typography>
+          {qa.map((item, index) => (
+            <Accordion
+              key={index}
+              expanded={expanded === `panel${index}`}
+              onChange={handleChange(`panel${index}`)}
+              sx={{ direction: language === "ar" ? "rtl" : "ltr" }}
+            >
+              <AccordionSummary
+                expandIcon={
+                  <ExpandMoreIcon
+                    sx={{
+                      transform:
+                        language === "ar" ? "rotate(180deg)" : "rotate(0deg)",
+                    }}
+                  />
+                }
+                aria-controls={`panel${index}bh-content`}
+                id={`panel${index}bh-header`}
+              >
+                <Typography
+                  sx={{ width: "100%", flexShrink: 0, fontWeight: "bold" }}
+                >
+                  {item.question}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{ direction: language === "ar" ? "rtl" : "ltr" }}
+              >
+                <Typography>{item.answer}</Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </SectionBox>
+
+        {/* Testimonials Section */}
+        <SectionBox
+          sx={{ mt: 16, direction: language === "ar" ? "rtl" : "ltr" }}
+        >
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#333",
+              mb: 4,
+              textAlign: "center",
+            }}
+          >
+            <Translate textKey="testimonials" />
+          </Typography>
+          <Grid
+            container
+            spacing={4}
+            justifyContent="center"
+            direction={language === "ar" ? "row-reverse" : "row"}
+          >
+            {testimonials.map((testimonial, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <CardBox sx={{ direction: language === "ar" ? "rtl" : "ltr" }}>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ fontStyle: "italic", mb: 2 }}
+                  >
+                    "{testimonial.text}"
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: "bold", color: "#333" }}
+                  >
+                    - {testimonial.name}
+                  </Typography>
+                </CardBox>
+              </Grid>
+            ))}
+          </Grid>
+        </SectionBox>
+
         {/* Features Section */}
         <Grid container spacing={4} justifyContent="center" sx={{ mb: 16 }}>
           {features.map((feature, index) => (
@@ -202,5 +327,3 @@ export const Home = () => {
     </StyledBox>
   );
 };
-
-export default Home;
